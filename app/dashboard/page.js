@@ -6,8 +6,7 @@ import LinktreeLoading from "@/components/LinktreeLoading";
 import Navbar from "@/components/Navbar";
 import { useUser } from "@clerk/nextjs";
 import { Plus, Link2, Globe, Edit3, Eye, Copy, Share2 } from "lucide-react";
-import Image from "next/image";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import toast, { Toaster } from "react-hot-toast";
 import { SignInButton } from "@clerk/nextjs";
 
@@ -17,10 +16,17 @@ export default function LinktreeForm() {
 
   // ❗️MUST be declared before any conditional return to follow the Rules of Hooks
   const [copied, setCopied] = useState(false);
+  const [origin, setOrigin] = useState("");
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      setOrigin(window.location.origin);
+    }
+  }, []);
 
   // Handle copying the public profile link
   const handleCopy = async () => {
-    const textToCopy = `https://link-hub-by-hammad-mustafa.vercel.app//links/${user.id}`;
+    const textToCopy = `${window.location.origin}/links/${user.id}`;
     try {
       await navigator.clipboard.writeText(textToCopy);
       setCopied(true);
@@ -169,7 +175,8 @@ export default function LinktreeForm() {
             <div className="text-center mb-6">
               <div className="relative inline-block mb-6">
                 <div className="w-24 h-24 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-full mx-auto flex items-center justify-center text-white text-3xl font-bold shadow-lg">
-                  <Image
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
                     className="rounded-full"
                     src={user.imageUrl}
                     alt="profile"
@@ -257,8 +264,7 @@ export default function LinktreeForm() {
                 <p className="text-sm text-gray-500 mb-3">Your public link</p>
                 <div className="flex items-center justify-center gap-3 mb-4">
                   <code className="font-mono text-lg text-gray-900 bg-white px-4 py-2 rounded-lg border">
-                    https://linktr-ee-clone07-by-hammad.vercel.app/links/
-                    {user.id}
+                    {origin ? `${origin}/links/${user.id}` : `.../links/${user.id}`}
                   </code>
                 </div>
               </div>

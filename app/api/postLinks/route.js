@@ -1,49 +1,71 @@
-import clientPromise from "@/lib/mongodb";
+
+import { connectDB } from "@/lib/mongodb";
 import { NextResponse } from "next/server";
 
 export async function POST(request) {
   try {
-    const client = await clientPromise;
-    const db = client.db("linktree_clone_project");
-    const collection = db.collection("links");
-
     const body = await request.json();
 
-    const { userId, link, linkText, imgUrl, userName } = body;
-
-    // ✅ Proper validation
-    if (!userId || !link || !linkText || !imgUrl || !userName) {
-      return NextResponse.json(
-        {
-          success: false,
-          message: "❌ All fields (userId, linkText, link, imgUrl, userName) are required.",
-        },
-        { status: 400 }
-      );
-    }
-
-    const result = await collection.insertOne({
+    const {
       userId,
       link,
       linkText,
       imgUrl,
       userName,
+    } = body;
+
+    // Validate required fields
+    if (!userId || !link || !linkText || !imgUrl || !userName) {
+      return NextResponse.json(
+        {
+          success: false,
+          message:
+            "All fields (userId, link, linkText, imgUrl, userName) are required.",
+        },
+        {
+          status: 400,
+        }
+      );
+    }
+
+    // Connect to MongoDB
+    const db = await connectDB();
+
+    const linksCollection = db.collection("links");
+
+    // Insert new link
+    const result = await linksCollection.insertOne({
+      userId,
+      link,
+      linkText,
+      imgUrl,
+      userName,
+      createdAt: new Date(),
+      updatedAt: new Date(),
     });
+
 
     return NextResponse.json(
       {
         success: true,
-        message: "✅ Link added successfully",
-        insertedId: result.insertedId.toString(),
+        message: "Link added successfully",
+        data: {
+          insertedId: result.insertedId.toString(),
+        },
       },
-      { status: 200 }
+      {
+        status: 201,
+      }
     );
-  } catch (err) {
+
+  } catch (error) {
+    console.error("ADD LINK ERROR:", error);
+
     return NextResponse.json(
       {
         success: false,
-        message: "❌ Failed to add link",
-        error: err?.message || "Unknown error",
+        message: "Internal server error",
+        error: error.message,
       },
       {
         status: 500,
@@ -51,3 +73,4 @@ export async function POST(request) {
     );
   }
 }
+

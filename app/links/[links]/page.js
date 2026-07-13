@@ -1,7 +1,6 @@
 
 'use client';
 
-import Image from 'next/image';
 import { useEffect, useState } from 'react';
 
 export default function Links({ params }) {
@@ -122,13 +121,13 @@ export default function Links({ params }) {
         {/* Profile Section */}
         <div className="text-center mb-10">
           <div className="relative mb-6">
-            <Image
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
               src={imgUrl}
               alt="Profile"
               height={100}
               width={100}
-              className="w-32 h-32 rounded-full mx-auto border-4 border-white shadow-xl ring-4 ring-purple-100 object-cover"
-              onLoad={(e) => e.target.classList.add('animate-fade-in')}
+              className="w-32 h-32 rounded-full mx-auto border-4 border-white shadow-xl ring-4 ring-purple-100 object-cover animate-fade-in"
             />
           </div>
           <h1 className="text-2xl font-bold text-gray-800 mb-3">{userName}</h1>

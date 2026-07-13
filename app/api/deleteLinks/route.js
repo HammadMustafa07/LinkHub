@@ -1,43 +1,86 @@
 import { ObjectId } from "mongodb";
-import clientPromise from "@/lib/mongodb";
+import { connectDB } from "@/lib/mongodb";
 import { NextResponse } from "next/server";
 
 export async function DELETE(request) {
   try {
     const { id } = await request.json();
 
+    // Validate ID
     if (!id) {
       return NextResponse.json(
-        { success: false, message: "ID is required" },
-        { status: 400 }
+        {
+          success: false,
+          message: "ID is required",
+        },
+        {
+          status: 400,
+        }
       );
     }
 
-    const client = await clientPromise;
-    const db = client.db("linktree_clone_project");
-    const collection = db.collection("links");
+    // Validate MongoDB ObjectId format
+    if (!ObjectId.isValid(id)) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: "Invalid link ID",
+        },
+        {
+          status: 400,
+        }
+      );
+    }
 
-    const result = await collection.deleteOne({ _id: new ObjectId(id) });
+    // Connect to MongoDB
+    const db = await connectDB();
 
+    const linksCollection = db.collection("links");
+
+    // Delete link
+    const result = await linksCollection.deleteOne({
+      _id: new ObjectId(id),
+    });
+
+
+    // Check if document existed
     if (result.deletedCount === 0) {
       return NextResponse.json(
-        { success: false, message: "Link not found" },
-        { status: 404 }
+        {
+          success: false,
+          message: "Link not found",
+        },
+        {
+          status: 404,
+        }
       );
     }
 
-    return NextResponse.json({
-      success: true,
-      message: "✅ Link deleted successfully",
-    });
-  } catch (err) {
+
+    return NextResponse.json(
+      {
+        success: true,
+        message: "Link deleted successfully",
+      },
+      {
+        status: 200,
+      }
+    );
+
+
+  } catch (error) {
+    console.error("DELETE LINK ERROR:", error);
+
     return NextResponse.json(
       {
         success: false,
-        message: "❌ Failed to delete link",
-        error: err?.message || "Unknown error",
+        message: "Internal server error",
+        error: error.message,
       },
-      { status: 500 }
+      {
+        status: 500,
+      }
     );
   }
 }
+

@@ -48,7 +48,7 @@ export default function Navbar() {
                   Dashboard
                 </Link>
                 <Link
-                  href={`https://link-hub-by-hammad-mustafa.vercel.app//links/${user?.id}`}
+                  href={`/links/${user?.id}`}
                   className="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200"
                   target="_blank"
                   rel="noopener noreferrer"
@@ -135,7 +135,7 @@ export default function Navbar() {
                 Dashboard
               </Link>
               <Link
-                href={`https://linktr-ee-clone07-by-hammad.vercel.app/links/${user?.id}`}
+                href={`/links/${user?.id}`}
                 className="text-gray-700 hover:text-blue-600 block px-3 py-2 rounded-md text-base font-medium transition-colors duration-200"
                 onClick={handleLinkClick}
                 target="_blank"
